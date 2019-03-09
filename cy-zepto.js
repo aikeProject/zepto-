@@ -17,6 +17,11 @@
     var Zepto = (function () {
         var $, zepto = {};
 
+        var emptyArray = [];
+        var sconcat = emptyArray.concat,
+            filter = emptyArray.filter,
+            slice = emptyArray.slice;
+
         // 正则表达式
         // 类似于这样的'<html>', '<html>d</html>'会被匹配
         var fragmentRE = /^\s*<(\w+|!)[^>]*>/,
@@ -36,6 +41,10 @@
                 'th': tableRow,
                 '*': document.createElement('div')
             };
+        var isArray = Array.isArray ||
+            function (object) {
+                return object instanceof Array
+            };
 
         var class2type = {},
             toString = class2type.toString;
@@ -52,6 +61,15 @@
             return obj != null && obj == obj.window
         }
 
+        function isObject(obj) {
+            return type(obj) == "object"
+        }
+
+        // 纯对象
+        function isPlainObject(obj) {
+            return isObject(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype
+        }
+
         // 判断是不是伪数组
         function likeArray(obj) {
             var length = !!obj && 'length' in obj && obj.length,
@@ -60,6 +78,12 @@
                 'array' == type || length === 0 ||
                 (typeof length == 'number' && length > 0 && (length - 1) in obj)
             )
+        }
+
+        function compact(array) {
+            return filter.call(array, function (item) {
+                return item != null
+            })
         }
 
         // 将dom挂载到Z对象实例上
@@ -78,13 +102,15 @@
         // 接受一个html字符串和一个可选的标签名
         // 从给定的html字符串生成DOM节点
         // 生成的DOM节点作为数组返回
+        // html 标签字符串 name 标签名 properties 属性对象
         zepto.fragment = function (html, name, properties) {
             var dom, nodes, container;
 
             // 空标签将会被匹配
             // '<div></div>' '<div>' '<div/>' 将会被匹配 其中'RegExp.$1'的$1代表了'html'
+            console.log($.type(document.createElement(RegExp.$1)))
             if (singleTagRE.test(html)) dom = $(document.createElement(RegExp.$1));
-
+            console.log(dom)
             // 如果不符合上一个条件
             if (!dom) {
                 // '<div id="dddd"/> <p />' 将转换为 '<div id="dddd"></div> <p ></p>'
@@ -96,8 +122,16 @@
 
                 container = containers[name];
                 container.innerHTML = '' + html;
-                // dom =
+                //TODO slice.call 真伪数组转换
+                dom = $.each(slice.call(container.childNodes), function () {
+                    container.removeChild(this);
+                });
             }
+
+            // 如果是一个纯数组
+            // if (isPlainObject(properties))
+
+            return dom;
         };
 
         // 初始化函数 init
@@ -115,9 +149,22 @@
                 selector = selector.trim();
                 // 判断‘selector’是不是一个标签字符串
                 if (selector[0] == '<' && fragmentRE.test(selector)) {
-                    // dom = zepto.fragment
+                    dom = zepto.fragment(selector, RegExp.$1, context), selector = null
+                }
+                // 如果有上下文，要在上下文里查找
+                else if (context !== undefined) return $(context).find(selector);
+                // css选择器
+                else dom = zepto.qsa(document, selector);
+            } else {
+                if (isArray(selector)) dom = compact(selector);
+                else if (isObject(selector)) {
+                    dom = [selector], selector = null;
+                } else if (fragmentRE.test(selector)) {
+                    dom = zepto.fragment(selector.trim(), RegExp.$1, context), selector = null
                 }
             }
+
+            return zepto.Z(dom, selector)
         };
 
         // 调用`zepto.init`进行初始化
