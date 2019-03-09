@@ -53,6 +53,9 @@
         var arr = [].slice.call(obj);
         console.log(arr);
     ```
+    
+    - nodeType
+    
 -   `init`初始化函数入口
 ```js
 

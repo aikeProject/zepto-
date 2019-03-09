@@ -28,7 +28,11 @@
             // '<html></html>' '<html>' '<html/>' 将会被匹配
             singleTagRE = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
             // 匹配这样的内容 '<div id="dddd"/> <p />'
-            tagExpanderRE = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig;
+            tagExpanderRE = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
+            simpleSelectorRE = /^[\w-]*$/;
+
+        //
+        var methodAttributes = ['val', 'css', 'html', 'text', 'data', 'width', 'height', 'offset'];
 
         var table = document.createElement('table'),
             tableRow = document.createElement('tr'),
@@ -49,14 +53,14 @@
         var class2type = {},
             toString = class2type.toString;
 
-        // 类型检测的方法
+        //TODO 类型检测的方法
         function type(obj) {
             // 第一次调用都会返回‘object’
             return obj == null ? String(obj) :
                 class2type[toString.call(obj)] || "object"
         }
 
-        // 判断是不是 'window'对象 window == window.window -> true
+        //TODO 判断是不是 'window'对象 window == window.window -> true
         function isWindow(obj) {
             return obj != null && obj == obj.window
         }
@@ -65,7 +69,7 @@
             return type(obj) == "object"
         }
 
-        // 纯对象
+        //TODO 纯对象
         function isPlainObject(obj) {
             return isObject(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype
         }
@@ -108,9 +112,8 @@
 
             // 空标签将会被匹配
             // '<div></div>' '<div>' '<div/>' 将会被匹配 其中'RegExp.$1'的$1代表了'html'
-            console.log($.type(document.createElement(RegExp.$1)))
             if (singleTagRE.test(html)) dom = $(document.createElement(RegExp.$1));
-            console.log(dom)
+
             // 如果不符合上一个条件
             if (!dom) {
                 // '<div id="dddd"/> <p />' 将转换为 '<div id="dddd"></div> <p ></p>'
@@ -122,19 +125,35 @@
 
                 container = containers[name];
                 container.innerHTML = '' + html;
-                //TODO slice.call 真伪数组转换
+                // TODO slice.call 真伪数组转换
+                // container.childNodes伪数组 这里是将伪数组转化真数组
                 dom = $.each(slice.call(container.childNodes), function () {
                     container.removeChild(this);
                 });
             }
 
-            // 如果是一个纯数组
-            // if (isPlainObject(properties))
+            // TODO $('<div></div>', {height: '10px'}) 如果是一个纯数组
+            // 作用就是将其添加到创建好的dom里面
+            if (isPlainObject(properties)) {
+                // zepto对象
+                nodes = $(dom);
+                $.each(properties, function (key, value) {
+                    // ['val', 'css', 'html', 'text', 'data', 'width', 'height', 'offset']
+                    // 如果是设置这些属性，调用定义在zepto的方法进行设置
+                    if (methodAttributes.indexOf(key) > -1) {
+                        nodes[key](value);
+                    }
+                    // attr方法进行设置
+                    else {
+                        nodes.attr(key, value);
+                    }
+                });
+            }
 
             return dom;
         };
 
-        // 初始化函数 init
+        // TODO 初始化函数 init
         // selector 传入的选择器
         // 'init'主要做的事情就是根据传入的'selector'类型，分别判断执行不同的任务
         zepto.init = function (selector, context) {
@@ -153,7 +172,7 @@
                 }
                 // 如果有上下文，要在上下文里查找
                 else if (context !== undefined) return $(context).find(selector);
-                // css选择器
+                // TODO css选择器
                 else dom = zepto.qsa(document, selector);
             } else {
                 if (isArray(selector)) dom = compact(selector);
@@ -161,7 +180,12 @@
                     dom = [selector], selector = null;
                 } else if (fragmentRE.test(selector)) {
                     dom = zepto.fragment(selector.trim(), RegExp.$1, context), selector = null
+                } else if (context !== undefined) {
+                    return $(context).find(selector)
+                } else {
+                    dom = zepto.qsa(document, selector)
                 }
+                return zepto.Z(dom, selector);
             }
 
             return zepto.Z(dom, selector)
@@ -170,6 +194,39 @@
         // 调用`zepto.init`进行初始化
         $ = function (selector, context) {
             return zepto.init(selector, context)
+        };
+
+        // TODO 选择器方法
+        // 作用：
+        // '#id' -> document.getElementById
+        // '.class' -> document.getElementsByClassName
+        // 'div' -> document.getElementsByTagName
+        // '其他' -> document.querySelectorAll
+        zepto.qsa = function (element, selector) {
+            var found,
+                maybeID = selector[0] == '#',
+                maybeClass = !maybeID && selector[0] == '.',
+                nameOnly = maybeID || maybeClass ? selector.slice(1) : selector,
+                isSimple = simpleSelectorRE.test(nameOnly);
+
+            if (element.getElementById && isSimple && maybeID) {
+                found = element.getElementById(nameOnly);
+                if (found) {
+                    return [found];
+                } else {
+                    return [];
+                }
+            } else {
+                if (element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) {
+                    return [];
+                } else {
+                    slice.call(
+                        isSimple && !maybeID && element.getElementsByClassName ?
+                            maybeClass ? element.getElementsByClassName(nameOnly) : element.getElementsByTagName(selector) :
+                            element.querySelectorAll(selector)
+                    )
+                }
+            }
         };
 
         // 工具方法

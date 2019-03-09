@@ -6,82 +6,86 @@
     <script src="./cy-zepto.js"></script>
 </head>
 <body>
-    <script>
-        // var reg1 = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig;
-        // var a = '<div/>';
-        // var b = '<img/>';
-        // var c = '<div></div>';
-        // var d = '<div id="dddd"/> <p />';
-        // console.log(a.match(reg1));
-        // console.log(b.match(reg1));
-        // console.log(c.match(reg1));
-        // console.log(d.match(reg1));
-        // console.log(d.replace(reg1, "<$1></$2>"))
-        // console.log(reg1.exec(d))
+<script>
+    // var reg1 = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig;
+    // var a = '<div/>';
+    // var b = '<img/>';
+    // var c = '<div></div>';
+    // var d = '<div id="dddd"/> <p />';
+    // console.log(a.match(reg1));
+    // console.log(b.match(reg1));
+    // console.log(c.match(reg1));
+    // console.log(d.match(reg1));
+    // console.log(d.replace(reg1, "<$1></$2>"))
+    // console.log(reg1.exec(d))
 
-        // var reg = /^<(\w+)\s*\/?>(?:<\/\1>|)$/;
-        // var a = '<div/>';
-        // console.log(a.match(reg))
-        // console.log(reg.exec(a))
-        // console.log(reg.test(a) && RegExp.$1)
+    // var reg = /^<(\w+)\s*\/?>(?:<\/\1>|)$/;
+    // var a = '<div/>';
+    // console.log(a.match(reg))
+    // console.log(reg.exec(a))
+    // console.log(reg.test(a) && RegExp.$1)
 
-        // 正则表达式
-        // 类似于这样的'<html>', '<html>d</html>'会被匹配
-        var fragmentRE = /^\s*<(\w+|!)[^>]*>/,
-            // '<html></html>' '<html>' '<html/>' 将会被匹配
-            singleTagRE = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
-            // 匹配这样的内容 '<div id="dddd"/> <p />'
-            tagExpanderRE = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig;
+    // 正则表达式
+    // 类似于这样的'<html>', '<html>d</html>'会被匹配
+    var fragmentRE = /^\s*<(\w+|!)[^>]*>/,
+        // '<html></html>' '<html>' '<html/>' 将会被匹配
+        singleTagRE = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
+        // 匹配这样的内容 '<div id="dddd"/> <p />'
+        tagExpanderRE = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig;
 
-        // var html = '<div id="dddd"/> <p />';
-        // var html = '<div id="dddd"/> <p />';
-        //
-        // function test(html, name) {
-        //     if (html.replace) html = html.replace(tagExpanderRE, "<$1></$2>");
-        //     console.log(html)
-        //     console.log(fragmentRE.test(html))
-        //     console.log(fragmentRE.exec(html))
-        //     if (name === undefined) {
-        //         name = fragmentRE.test(html) && RegExp.$1;
-        //         console.log('name--', name);
-        //     }
-        //     console.log('name--', name)
-        // }
-        // test(html)
+    // var html = '<div id="dddd"/> <p />';
+    // var html = '<div id="dddd"/> <p />';
+    //
+    // function test(html, name) {
+    //     if (html.replace) html = html.replace(tagExpanderRE, "<$1></$2>");
+    //     console.log(html)
+    //     console.log(fragmentRE.test(html))
+    //     console.log(fragmentRE.exec(html))
+    //     if (name === undefined) {
+    //         name = fragmentRE.test(html) && RegExp.$1;
+    //         console.log('name--', name);
+    //     }
+    //     console.log('name--', name)
+    // }
+    // test(html)
 
-        // var table = document.createElement('table'),
-        //     tableRow = document.createElement('tr'),
-        //     containers = {
-        //         'tr': document.createElement('tbody'),
-        //         'tbody': table,
-        //         'thead': table,
-        //         'tfoot': table,
-        //         'td': tableRow,
-        //         'th': tableRow,
-        //         '*': document.createElement('div')
-        //     };
-        //
-        // console.log('div' in containers)
-        // var name = ''
-        // console.log(containers[name])
+    // var table = document.createElement('table'),
+    //     tableRow = document.createElement('tr'),
+    //     containers = {
+    //         'tr': document.createElement('tbody'),
+    //         'tbody': table,
+    //         'thead': table,
+    //         'tfoot': table,
+    //         'td': tableRow,
+    //         'th': tableRow,
+    //         '*': document.createElement('div')
+    //     };
+    //
+    // console.log('div' in containers)
+    // var name = ''
+    // console.log(containers[name])
 
-        // var class2type = {},
-        //     toString = class2type.toString;
-        // // 类型检测的方法
-        // function type(obj) {
-        //     // console.log('--1', toString.call(obj));
-        //     // console.log('--2', class2type[toString.call(obj)]);
-        //     return obj == null ? String(obj) :
-        //         class2type[toString.call(obj)] || "object"
-        // }
-        // console.log(type({}))
-        // console.log(type(1))
+    // var class2type = {},
+    //     toString = class2type.toString;
+    // // 类型检测的方法
+    // function type(obj) {
+    //     // console.log('--1', toString.call(obj));
+    //     // console.log('--2', class2type[toString.call(obj)]);
+    //     return obj == null ? String(obj) :
+    //         class2type[toString.call(obj)] || "object"
+    // }
+    // console.log(type({}))
+    // console.log(type(1))
 
-        // console.log($.type('ddd'))
-        // console.log($('<div>aa</div>')[0])
-        // console.log($('<div>'))
-        var dom = document.createElement('div')
-        console.log(Array.isArray(dom))
-    </script>
+    // console.log($.type('ddd'))
+    // console.log($('<div>aa</div>')[0])
+    // console.log($('<div>'))
+    // var dom = document.createElement('div')
+    // console.log(Array.isArray(dom))
+
+    var dom = document.createElement('div');
+    dom.innerHTML = '' + '<div></div><div></div><div></div>';
+    console.log(Array.isArray([].slice.call(dom.childNodes)))
+</script>
 </body>
 </html>
