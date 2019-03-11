@@ -173,7 +173,9 @@
                 // 如果有上下文，要在上下文里查找
                 else if (context !== undefined) return $(context).find(selector);
                 // TODO css选择器
-                else dom = zepto.qsa(document, selector);
+                else {
+                    dom = zepto.qsa(document, selector)
+                }
             } else {
                 if (isArray(selector)) dom = compact(selector);
                 else if (isObject(selector)) {
@@ -208,7 +210,7 @@
                 maybeClass = !maybeID && selector[0] == '.',
                 nameOnly = maybeID || maybeClass ? selector.slice(1) : selector,
                 isSimple = simpleSelectorRE.test(nameOnly);
-
+            
             if (element.getElementById && isSimple && maybeID) {
                 found = element.getElementById(nameOnly);
                 if (found) {
@@ -220,10 +222,10 @@
                 if (element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) {
                     return [];
                 } else {
-                    slice.call(
+                    return slice.call(
                         isSimple && !maybeID && element.getElementsByClassName ?
-                            maybeClass ? element.getElementsByClassName(nameOnly) : element.getElementsByTagName(selector) :
-                            element.querySelectorAll(selector)
+                            maybeClass ? element.getElementsByClassName(nameOnly) : element.getElementsByTagName(selector)
+                            : element.querySelectorAll(selector)
                     )
                 }
             }

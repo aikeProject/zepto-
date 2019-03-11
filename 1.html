@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./cy-zepto.js"></script>
+</head>
+<body>
+<div>1</div>
+<div id="foo">2</div>
+<div>3</div>
+<script>
+    //=> ID 为 "foo" 的元素
+    console.log($('#foo'))
+
+    //=> 所有页面中得div元素
+    console.log($('div'))
+
+    // 创建元素:
+    console.log($("<p>Hello</p>")) //=> 新的p元素
+
+    // 创建带有属性的元素:
+    // console.log($("<p />", { text:"Hello", id:"greeting", css:{color:'darkblue'} }))
+    //=> <p id=greeting style="color:darkblue">Hello</p>
+
+    // 当页面ready的时候，执行回调:
+    // Zepto(function($){
+    //     alert('Ready to Zepto!')
+    // })
+</script>
+</body>
+</html>

@@ -56,7 +56,24 @@
     
     - nodeType
     
+	| 节点类型                        | 描述                                                                                  | 子节点                                                                               |
+	|  --------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+	| Element                         | 代表元素                                                                            | Element, Text, Comment, ProcessingInstruction, CDATASection, EntityReference |
+	| Attr                                | 代表属性                                                                             | Text, EntityReference |
+	| Text                               | 代表元素或属性中的文本内容。                                         | None |
+	| CDATASection              | 代表文档中的 CDATA 部分（不会由解析器解析的文本）。 | None |
+	| EntityReference            | 代表实体引用。                                                                     |  Element, ProcessingInstruction, Comment, Text, CDATASection, EntityReference |
+	| Entity                             | 代表实体。                                                                            |  Element, ProcessingInstruction, Comment, Text, CDATASection, EntityReference |
+	| ProcessingInstruction   | 代表处理指令。                                                                     |  None|
+	| Comment                      | 代表注释。                                                                             |  None |
+	| Document                     | 代表整个文档（DOM 树的根节点）。                                    |  Element, ProcessingInstruction, Comment, DocumentType|
+	| DocumentFragment     | 代表轻量级的 Document 对象，能够容纳文档的某个部分     | Element, ProcessingInstruction, Comment, Text, CDATASection, EntityReference  |
+	| Notation                       |  代表 DTD 中声明的符号。                                                     |  None |
+
+
+
 -   `init`初始化函数入口
 ```js
+
 
 ```
