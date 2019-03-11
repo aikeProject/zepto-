@@ -31,7 +31,7 @@
             tagExpanderRE = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
             simpleSelectorRE = /^[\w-]*$/;
 
-        //
+        // 设置属性
         var methodAttributes = ['val', 'css', 'html', 'text', 'data', 'width', 'height', 'offset'];
 
         var table = document.createElement('table'),
