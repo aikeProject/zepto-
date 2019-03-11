@@ -70,10 +70,24 @@
 	| DocumentFragment     | 代表轻量级的 Document 对象，能够容纳文档的某个部分     | Element, ProcessingInstruction, Comment, Text, CDATASection, EntityReference  |
 	| Notation                       |  代表 DTD 中声明的符号。                                                     |  None |
 
+    -   'readyState' HTML DOM readyState 属性返回当前文档状态  `document.readyState`
 
+	|  readyState   |  返回值   |
+	| --- | --- |
+	|  uninitialized     | 还未开始载入    |
+	|  loading    | 载入中    |
+	|  interactive     | 已加载，文档与用户可以交互    |
+	|  complete    |  载入完成  |        
+		
 
+        ```js
+        
+        ```
+    
+        
 -   `init`初始化函数入口
 ```js
 
 
 ```
+

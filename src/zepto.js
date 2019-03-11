@@ -12,7 +12,7 @@ var Zepto = (function () {
         slice = emptyArray.slice;
 
     // 正则表达式
-    // 类似于这样的'<html>', '<html>d</html>'会被匹配
+    // 类似于这样的'<html>', '<html>d</html>'会被匹配，html片段
     var fragmentRE = /^\s*<(\w+|!)[^>]*>/,
         // '<html></html>' '<html>' '<html/>' 将会被匹配
         singleTagRE = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
@@ -49,6 +49,11 @@ var Zepto = (function () {
             class2type[toString.call(obj)] || "object"
     }
 
+    //TODO isFunction 检测是否是函数
+    function isFunction(value) {
+        return type(value) == 'function'
+    }
+
     //TODO 判断是不是 'window'对象 window == window.window -> true
     function isWindow(obj) {
         return obj != null && obj == obj.window
@@ -64,6 +69,7 @@ var Zepto = (function () {
     }
 
     // 判断是不是伪数组
+    // TODO likeArray 伪数组
     function likeArray(obj) {
         var length = !!obj && 'length' in obj && obj.length,
             type = $.type(obj);
@@ -121,7 +127,7 @@ var Zepto = (function () {
             });
         }
 
-        // TODO $('<div></div>', {height: '10px'}) 如果是一个纯数组
+        // TODO $('<div></div>', {height: '10px'}) 如果是一个纯对象
         // 作用就是将其添加到创建好的dom里面
         if (isPlainObject(properties)) {
             // zepto对象
@@ -161,6 +167,10 @@ var Zepto = (function () {
             }
             // 如果有上下文，要在上下文里查找
             else if (context !== undefined) return $(context).find(selector);
+            // 如果传入的是一个函数‘function’，该函数在dom加载完时调用
+            else if (isFunction(selector)) {
+                return $(document).ready(selector);
+            }
             // TODO css选择器
             else {
                 dom = zepto.qsa(document, selector)
@@ -221,7 +231,10 @@ var Zepto = (function () {
     };
 
     // 工具方法
+    // TODO 类型检测
     $.type = type;
+
+    // TODO 遍历 each
     $.each = function (elements, callback) {
         var i, key;
         if (likeArray(elements)) {
@@ -242,6 +255,25 @@ var Zepto = (function () {
     $.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (i, name) {
         class2type["[object " + name + "]"] = name.toLowerCase();
     });
+
+    // TODO s.fn 定义所有可用方法
+    s.fn = {
+        // 将其指向 zepto.Z 这个函数
+        constructor: zepto.Z,
+        length: 0,
+
+        // dom加载完毕的检测函数
+        ready: function (callback) {
+
+            if (document.readyState === 'complete'
+                || (document.readyState === 'loading' && !document.documentElement.doScroll)) {
+
+            }
+        }
+    };
+
+    // 这里就是将‘$.fn’ 添加到 ‘zepto.Z’的原型上 和 ‘Z’的原型上
+    zepto.Z.prototype = Z.prototype = $.fn;
 
     return $;
 })();
