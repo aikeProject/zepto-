@@ -298,9 +298,16 @@ var Zepto = (function () {
     $.isArray = isArray;
     $.isPlainObject = isPlainObject;
 
+    // 如果该值为有限数值或一个字符串表示的数字，则返回ture。
+    $.isNumeric = function (val) {
+        var num = Number(val), type = typeof val;
+        return val != null && type != 'boolean' &&
+            (type != 'string' || val.length) &&
+            !isNaN(num) && isFinite(num) || false
+    };
+
     // $.inArray(element, array, [fromIndex])   ⇒ number
     // 返回数组中指定元素的索引值（注：以0为基数），如果没有找到该元素则返回-1。
-
     $.inArray = function (elem, array, i) {
         return emptyArray.indexOf.call(array, elem, i);
     };
