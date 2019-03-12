@@ -263,11 +263,24 @@ var Zepto = (function () {
         length: 0,
 
         // dom加载完毕的检测函数
+        // 详见 https://segmentfault.com/a/1190000005869515
         ready: function (callback) {
-
+            // 详见README readyState 的几个状态
             if (document.readyState === 'complete'
                 || (document.readyState === 'loading' && !document.documentElement.doScroll)) {
+                // setTimeout(fn, 0)的应用 详见 https://blog.csdn.net/jingtian678/article/details/79547596
+                setTimeout(function () {
+                    callback($);
+                }, 0);
+            } else {
+                var handler = function () {
+                    document.removeEventListener('DOMContentLoaded', handler, false);
+                    window.removeEventListener('load', handler, false);
+                    callback($);
+                };
 
+                document.addEventListener('DOMContentLoaded', handler, false);
+                window.addEventListener('load', handler, false);
             }
         }
     };

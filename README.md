@@ -70,19 +70,37 @@
 	| DocumentFragment     | 代表轻量级的 Document 对象，能够容纳文档的某个部分     | Element, ProcessingInstruction, Comment, Text, CDATASection, EntityReference  |
 	| Notation                       |  代表 DTD 中声明的符号。                                                     |  None |
 
-    -   'readyState' HTML DOM readyState 属性返回当前文档状态  `document.readyState`
+    -   'readyState' HTML DOM readyState 属性返回当前文档状态  `document.readyState` [详见](https://segmentfault.com/a/1190000005869515)
 
 	|  readyState   |  返回值   |
 	| --- | --- |
 	|  uninitialized     | 还未开始载入    |
 	|  loading    | 载入中    |
 	|  interactive     | 已加载，文档与用户可以交互    |
-	|  complete    |  载入完成  |        
-		
+	|  complete    |  载入完成  |     
+	
+	-  关于页面加载的一些事件
+		-  `onload`事件，`window.onload`. 作用: onload事件的实际效果是当页面解析完DOM树，并且完成了所有图片、样式表、脚本等资源的加载后才被触发
+		-  `DOMContentLoaded`, DOM内容加载完后就触发，无需等待其他资源的加载完成。
+		-   `onreadystatechange` 低版本ie不支持`DOMContentLoaded`，可以用`onreadystatechange`代替
+		-   `doScroll` 低于`ie8`,可以通过每隔一段时间执行一次document.documentElement.doScroll("left")来检测这一状态，因为这条代码在DOM加载完毕之前执行时会抛出错误(throw an error)
+	
+	- `setTimeout(fn, 0)`的应用 [详见](https://blog.csdn.net/jingtian678/article/details/79547596)
+	```
+	setTimeout(fn, 0)的一大应用是，可以调整事件的发生顺序。比如，网页开发中，某个事件先发生在子元素，然后冒泡到父元素，即子元素的事件回调函数，会早于父元素的事件回调函数触发。如果，我们先让父元素的事件回调函数先发生，就要用到setTimeout(fn, 0);
+	
+	
+	document.getElementById("haoroomsID").onclick = function A() {
+	  setTimeout(function B() {
+		console.log("触发子元素事件")
+	  }, 0)
+	};
 
-        ```js
-        
-        ```
+	document.body.onclick = function C() {
+	 console.log("触发父元素事件")
+	};
+	点击haoroomsID会先触发父级元素事件，然后再触发子元素事件
+	```
     
         
 -   `init`初始化函数入口
