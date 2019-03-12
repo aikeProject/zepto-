@@ -149,6 +149,8 @@ var Zepto = (function () {
     var class2type = {},
         toString = class2type.toString;
 
+    var camelize, uniq;
+
     //TODO 类型检测的方法
     function type(obj) {
         // 第一次调用都会返回‘object’
@@ -191,6 +193,14 @@ var Zepto = (function () {
             return item != null
         })
     }
+
+    // 将一组字符串变成“骆驼”命名法的新字符串，如果该字符已经是“骆驼”命名法，则不变化。
+    camelize = function (str) {
+        return str.replace(/-+(.)?/g, function (match, chr) {
+            // toUpperCase首字母大写
+            return chr ? chr.toUpperCase() : '';
+        });
+    };
 
     // 将dom挂载到Z对象实例上
     function Z(dom, selector) {
@@ -260,67 +270,6 @@ var Zepto = (function () {
         return object instanceof zepto.Z;
     };
 
-    // TODO 初始化函数 init
-    // selector 传入的选择器
-    // 'init'主要做的事情就是根据传入的'selector'类型，分别判断执行不同的任务
-    zepto.init = function (selector, context) {
-        var dom;
-        // 如果未传入参数'selector'
-        // 如果什么都没有给出，返回一个空的Zepto集合
-        // zepto.Z()将创建一个空的对象集合
-        if (!selector) return zepto.Z();
-        // 如果'selector'传入字符串
-        else if (typeof selector == 'string') {
-            // 去除前后空格
-            selector = selector.trim();
-            // 判断‘selector’是不是一个标签字符串
-            if (selector[0] == '<' && fragmentRE.test(selector)) {
-                dom = zepto.fragment(selector, RegExp.$1, context), selector = null
-            }
-            // 如果有上下文，要在上下文里查找
-            else if (context !== undefined) return $(context).find(selector);
-            // TODO css选择器
-            else {
-                dom = zepto.qsa(document, selector)
-            }
-        }
-        // 如果传入的是一个函数‘function’，该函数在dom加载完时调用,这个就是平时我们用的jquery的ready函数
-        else if (isFunction(selector)) {
-            return $(document).ready(selector);
-        }
-        // 传入对象是不是zepto对象
-        else if (zepto.isZ(selector)) {
-            return selector;
-        }
-        else {
-            // 传入数组
-            if (isArray(selector)) dom = compact(selector);
-            // 传入一个对象
-            else if (isObject(selector)) {
-                dom = [selector], selector = null;
-            }
-            // 传入html片段
-            else if (fragmentRE.test(selector)) {
-                dom = zepto.fragment(selector.trim(), RegExp.$1, context), selector = null
-            }
-            // 是否传入上下文
-            else if (context !== undefined) {
-                return $(context).find(selector)
-            }
-            // 是一个选择器
-            else {
-                dom = zepto.qsa(document, selector)
-            }
-        }
-        // 最后将找到的dom转化为zepto对象
-        return zepto.Z(dom, selector)
-    };
-
-    // 调用`zepto.init`进行初始化
-    $ = function (selector, context) {
-        return zepto.init(selector, context)
-    };
-
     // TODO 选择器方法
     // 作用：
     // '#id' -> document.getElementById
@@ -354,9 +303,124 @@ var Zepto = (function () {
         }
     };
 
+    // TODO 初始化函数 init
+    // selector 传入的选择器
+    // 'init'主要做的事情就是根据传入的'selector'类型，分别判断执行不同的任务
+    zepto.init = function (selector, context) {
+        var dom;
+        // 如果未传入参数'selector'
+        // 如果什么都没有给出，返回一个空的Zepto集合
+        // zepto.Z()将创建一个空的对象集合
+        if (!selector) return zepto.Z();
+        // 如果'selector'传入字符串
+        else if (typeof selector == 'string') {
+            // 去除前后空格
+            selector = selector.trim();
+            // 判断‘selector’是不是一个标签字符串
+            if (selector[0] == '<' && fragmentRE.test(selector)) {
+                dom = zepto.fragment(selector, RegExp.$1, context), selector = null
+            }
+            // 如果有上下文，要在上下文里查找
+            else if (context !== undefined) return $(context).find(selector);
+            // TODO css选择器
+            else {
+                dom = zepto.qsa(document, selector)
+            }
+        }
+        // 如果传入的是一个函数‘function’，该函数在dom加载完时调用,这个就是平时我们用的jquery的ready函数
+        else if (isFunction(selector)) {
+            return $(document).ready(selector);
+        }
+        // 传入对象是不是zepto对象
+        else if (zepto.isZ(selector)) {
+            return selector;
+        } else {
+            // 传入数组
+            if (isArray(selector)) dom = compact(selector);
+            // 传入一个对象
+            else if (isObject(selector)) {
+                dom = [selector], selector = null;
+            }
+            // 传入html片段
+            else if (fragmentRE.test(selector)) {
+                dom = zepto.fragment(selector.trim(), RegExp.$1, context), selector = null
+            }
+            // 是否传入上下文
+            else if (context !== undefined) {
+                return $(context).find(selector)
+            }
+            // 是一个选择器
+            else {
+                dom = zepto.qsa(document, selector)
+            }
+        }
+        // 最后将找到的dom转化为zepto对象
+        return zepto.Z(dom, selector)
+    };
+
+    // 调用`zepto.init`进行初始化
+    $ = function (selector, context) {
+        return zepto.init(selector, context)
+    };
+
+    // 将一个对象复制到另一个目标对象上
+    function extend(target, source, deep) {
+        for (key in source) {
+            // 深拷贝
+            if (deep && (isPlainObject(source[key])) || isArray(source[key])) {
+                if (isPlainObject(source[key]) && !isPlainObject(target[key])) {
+                    target[key] = {};
+                }
+                if (isArray(source[key]) && !isArray(target[key])) {
+                    target[key] = [];
+                }
+                extend(target[key], source[key], deep);
+            }
+            // 浅拷贝
+            else if (source[key] !== undefined) {
+                target[key] = source[key];
+            }
+        }
+    }
+
+    // 通过源对象扩展目标对象的属性，源对象属性将覆盖目标对象属性。
+    // 默认情况下为，复制为浅拷贝（浅复制）。如果第一个参数为true表示深度拷贝（深度复制）。
+    $.extend = function (target) {
+        var deep, args = slice.call(arguments, 1);
+        if (typeof target == 'boolean') {
+            deep = target;
+            target = args.shift();
+        }
+        args.forEach(function (org) {
+            extend(target, org, deep)
+        });
+        return target;
+    };
+
     // 工具方法
     // TODO 类型检测
     $.type = type;
+    $.isFunction = isFunction;
+    $.isWindow = isWindow;
+    $.isArray = isArray;
+    $.isPlainObject = isPlainObject;
+
+    // 如果该值为有限数值或一个字符串表示的数字，则返回ture。
+    $.isNumeric = function (val) {
+        var num = Number(val), type = typeof val;
+        return val != null && type != 'boolean' &&
+            (type != 'string' || val.length) &&
+            !isNaN(num) && isFinite(num) || false
+    };
+
+    // $.inArray(element, array, [fromIndex])   ⇒ number
+    // 返回数组中指定元素的索引值（注：以0为基数），如果没有找到该元素则返回-1。
+    $.inArray = function (elem, array, i) {
+        return emptyArray.indexOf.call(array, elem, i);
+    };
+
+    // 驼峰 命名转化
+    $.camelCase = camelize;
 
     // TODO 遍历 each
     $.each = function (elements, callback) {
@@ -374,6 +438,13 @@ var Zepto = (function () {
         return elements;
     };
 
+    // $.grep(items, function(item){ ... })   ⇒ array
+    // 获取一个新数组，新数组只包含回调函数中返回 ture 的数组项。
+    // 同 filter()方法
+    $.grep = function (element, callback) {
+        return filter.call(element, callback);
+    };
+
     // Populate the class2type map
     // 第一次调用 ‘$.each’ 给 'class2type' 赋值, 类型检测的运用
     $.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (i, name) {
@@ -381,6 +452,7 @@ var Zepto = (function () {
     });
 
     // TODO s.fn 定义所有可用方法
+    // Zepto.fn是一个对象，它拥有Zepto对象上所有可用的方法，如 addClass()， attr()，和其它方法。在这个对象添加一个方法，所有的Zepto对象上都能用到该方法。
     $.fn = {
         // 将其指向 zepto.Z 这个函数
         constructor: zepto.Z,
@@ -408,7 +480,7 @@ var Zepto = (function () {
                 document.addEventListener('DOMContentLoaded', handler, false);
                 window.addEventListener('load', handler, false);
             }
-        }
+        },
     };
 
     // 这里就是将‘$.fn’ 添加到 ‘zepto.Z’的原型上 和 ‘Z’的原型上
@@ -420,6 +492,5 @@ var Zepto = (function () {
 // 将zepto挂载到window上，即可以直接使用Zepto或$调用
 window.Zepto = Zepto;
 window.$ === undefined && (window.$ = Zepto);
-
 ```
 
