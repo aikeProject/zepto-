@@ -293,6 +293,20 @@ var Zepto = (function () {
     // 工具方法
     // TODO 类型检测
     $.type = type;
+    $.isFunction = isFunction;
+    $.isWindow = isWindow;
+    $.isArray = isArray;
+    $.isPlainObject = isPlainObject;
+
+    // $.inArray(element, array, [fromIndex])   ⇒ number
+    // 返回数组中指定元素的索引值（注：以0为基数），如果没有找到该元素则返回-1。
+
+    $.inArray = function (elem, array, i) {
+        return emptyArray.indexOf.call(array, elem, i);
+    };
+
+    // 驼峰 命名转化
+    $.camelCase = camelize;
 
     // TODO 遍历 each
     $.each = function (elements, callback) {
@@ -310,16 +324,21 @@ var Zepto = (function () {
         return elements;
     };
 
+    // $.grep(items, function(item){ ... })   ⇒ array
+    // 获取一个新数组，新数组只包含回调函数中返回 ture 的数组项。
+    // 同 filter()方法
+    $.grep = function (element, callback) {
+        return filter.call(element, callback);
+    };
+
     // Populate the class2type map
     // 第一次调用 ‘$.each’ 给 'class2type' 赋值, 类型检测的运用
     $.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (i, name) {
         class2type["[object " + name + "]"] = name.toLowerCase();
     });
 
-    // 驼峰 命名转化
-    $.camelCase = camelize;
-
     // TODO s.fn 定义所有可用方法
+    // Zepto.fn是一个对象，它拥有Zepto对象上所有可用的方法，如 addClass()， attr()，和其它方法。在这个对象添加一个方法，所有的Zepto对象上都能用到该方法。
     $.fn = {
         // 将其指向 zepto.Z 这个函数
         constructor: zepto.Z,
