@@ -7,7 +7,7 @@ var Zepto = (function () {
     var $, zepto = {};
 
     var emptyArray = [];
-    var sconcat = emptyArray.concat,
+    var concat = emptyArray.concat,
         filter = emptyArray.filter,
         slice = emptyArray.slice;
 
@@ -65,7 +65,7 @@ var Zepto = (function () {
         return type(obj) == "object"
     }
 
-    //TODO 纯对象
+    //TODO 纯对象 该对象是通过 对象常量（"{}"） 或者 new Object 创建的
     function isPlainObject(obj) {
         return isObject(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype
     }
@@ -85,6 +85,10 @@ var Zepto = (function () {
         return filter.call(array, function (item) {
             return item != null
         })
+    }
+
+    function flatten(array) {
+        return array.length > 0 ? $.fn.concat.apply([], array) : array;
     }
 
     // 将一组字符串变成“骆驼”命名法的新字符串，如果该字符已经是“骆驼”命名法，则不变化。
@@ -315,6 +319,23 @@ var Zepto = (function () {
     // 驼峰 命名转化
     $.camelCase = camelize;
 
+    // 通过遍历集合中的元素，返回通过迭代函数的全部结果，（注：一个新数组）null 和 undefined 将被过滤掉。
+    $.map = function (elements, callback) {
+        var value, values = [], i, key;
+        if (likeArray(elements)) {
+            for (i = 0; i < elements.length; i++) {
+                value = callback(elements[i], i);
+                if (value != null) values.push(value);
+            }
+        } else {
+            for (key in elements) {
+                value = callback(elements[key], key);
+                if (value != null) values.push(value);
+            }
+        }
+        return flatten(values);
+    };
+
     // TODO 遍历 each
     $.each = function (elements, callback) {
         var i, key;
@@ -350,7 +371,14 @@ var Zepto = (function () {
         // 将其指向 zepto.Z 这个函数
         constructor: zepto.Z,
         length: 0,
-
+        concat: function () {
+            var i, value, args = [];
+            for (i = 0; i < arguments.length; i++) {
+                value = arguments[i];
+                args[i] = zepto.isZ(value) ? value.toArray() : value
+            }
+            return concat.apply(zepto.isZ(this) ? this.toArray() : this, args);
+        },
         // dom加载完毕的检测函数
         // 详见 https://segmentfault.com/a/1190000005869515
         // TODO ready
@@ -374,6 +402,13 @@ var Zepto = (function () {
                 window.addEventListener('load', handler, false);
             }
         },
+        get: function (idx) {
+            return idx === undefined ? slice.call(this) : this[idx >= 0 ? idx : idx + this.length]
+        },
+        // 返回数组，将zepto对象转化为真数组
+        toArray: function () {
+            return this.get()
+        }
     };
 
     // 这里就是将‘$.fn’ 添加到 ‘zepto.Z’的原型上 和 ‘Z’的原型上
