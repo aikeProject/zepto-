@@ -420,3 +420,4 @@ var Zepto = (function () {
 // 将zepto挂载到window上，即可以直接使用Zepto或$调用
 window.Zepto = Zepto;
 window.$ === undefined && (window.$ = Zepto);
+// module.exports = window.Zepto;

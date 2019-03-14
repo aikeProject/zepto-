@@ -4,13 +4,12 @@
     "main": "dist/zepto.js",
     "homepage": "http://zeptojs.com",
     "scripts": {
-        "test": "coffee make test",
-        "dist": "coffee make dist",
-        "start": "coffee test/server.coffee"
+        "dist": "coffee make dist"
     },
     "repository": "madrobby/zepto",
     "license": "MIT",
     "devDependencies": {
+        "chai": "^4.2.0",
         "coffee-script": "1.5.x",
         "express": "3.1.x",
         "mocha": "^6.0.2",
