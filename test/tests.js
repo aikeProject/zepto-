@@ -81,5 +81,28 @@ describe('zepto', () => {
         });
     })
 
+    describe('$.isNumber', () => {
+        it('$.isNumber 测试', function () {
+            expect($.isNumeric('-10')).to.be.true
+            expect($.isNumeric('0')).to.be.true
+            expect($.isNumeric(0)).to.be.true
+            expect($.isNumeric(10)).to.be.true
+            expect($.isNumeric('0xFF')).to.be.true
+            expect($.isNumeric('8e5')).to.be.true
+            expect($.isNumeric('3.124445')).to.be.true
+            expect($.isNumeric(-10)).to.be.true
+            expect($.isNumeric(+10)).to.be.true
+            expect($.isNumeric(0144)).to.be.true
 
+            expect($.isNumeric('-0x42')).to.be.false
+            expect($.isNumeric('7.2acdgs')).to.be.false
+            expect($.isNumeric('')).to.be.false
+            expect($.isNumeric({})).to.be.false
+            expect($.isNumeric(NaN)).to.be.false
+            expect($.isNumeric(null)).to.be.false
+            expect($.isNumeric(true)).to.be.false
+            expect($.isNumeric(Infinity)).to.be.false
+            expect($.isNumeric(undefined)).to.be.false
+        });
+    });
 });
