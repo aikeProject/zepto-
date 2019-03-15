@@ -49,6 +49,37 @@ describe('zepto', () => {
             expect($.isPlainObject('more')).to.be.false;
             expect($.isPlainObject(window)).to.be.false;
             expect($.isPlainObject($('html')[0])).to.be.false;
+            expect($.isPlainObject(new Boolean())).to.be.false;
+            expect($.isPlainObject(new Function())).to.be.false;
+            expect($.isPlainObject(new Date())).to.be.false;
+            expect($.isPlainObject(function () {
+            })).to.be.false;
+            expect($.isPlainObject(2)).to.be.false;
+            expect($.isPlainObject(true)).to.be.false;
+            expect($.isPlainObject(false)).to.be.false;
+
+            var F = function () {
+            }, obj;
+            F.prototype = {'a': 1};
+            obj = new F();
+
+            expect($.isPlainObject(obj)).to.be.false;
         });
     });
+
+    describe('$.isWindow', () => {
+        it('should window $.isWindow return true', function () {
+            expect($.isWindow()).to.be.false;
+            expect($.isWindow({})).to.be.false;
+            expect($.isWindow(document)).to.be.false;
+            expect($.isWindow(document.body)).to.be.false;
+            expect($.isWindow(window)).to.be.true;
+            expect($.isWindow(window.document)).to.be.false;
+            expect($.isWindow(window.window)).to.be.true;
+            expect($.isWindow(window.location)).to.be.false;
+            expect($.isWindow($('iframe')[0].contentWindow)).to.be.true;
+        });
+    })
+
+
 });
