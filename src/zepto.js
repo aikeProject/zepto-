@@ -34,6 +34,7 @@ var Zepto = (function () {
             'th': tableRow,
             '*': document.createElement('div')
         };
+    var tempParent = document.createElement('div');
     var isArray = Array.isArray ||
         function (object) {
             return object instanceof Array
@@ -43,6 +44,26 @@ var Zepto = (function () {
         toString = class2type.toString;
 
     var camelize, uniq;
+
+    // 当前元素是否被选择
+    zepto.matches = function (element, selector) {
+        if (!selector || !element || element.nodeType !== 1) {
+            return false;
+        }
+        // 详解 https://developer.mozilla.org/zh-CN/docs/Web/API/Element/matches
+        var matchesSelector = element.matches || element.webkitMatchesSelector ||
+            element.mozMatchesSelector || element.oMatchesSelector ||
+            element.matchesSelector;
+        if (matchesSelector) return matchesSelector.call(element, selector);
+
+        var match, parent = element.parentNode, temp = !parent;
+        if (temp) {
+            (parent = tempParent).appendChild(element);
+        }
+        match = ~zepto.qsa(parent, selector).indexOf(element);
+        temp && tempParent.removeChild(element);
+        return match
+    };
 
     //TODO 类型检测的方法
     function type(obj) {
@@ -86,6 +107,12 @@ var Zepto = (function () {
             return item != null
         })
     }
+
+    uniq = function (array) {
+        return filter.call(array, function (item, idx) {
+            return array.indexOf(item) == idx
+        });
+    };
 
     function flatten(array) {
         return array.length > 0 ? $.fn.concat.apply([], array) : array;
@@ -199,6 +226,19 @@ var Zepto = (function () {
             }
         }
     };
+
+    // 确定某个给定的节点是不是另一个节点的后代
+    $.contains = document.documentElement.contains ?
+        function (parent, node) {
+            return parent !== node && parent.contains(node);
+        } :
+        function (parent, node) {
+            // 递归遍历 node.parentNode 文档顶端，parentNode为null，循环结束
+            while (node && (node = node.parentNode)) {
+                if (node === parent) return true;
+            }
+            return false;
+        };
 
     // TODO 初始化函数 init
     // selector 传入的选择器
@@ -389,6 +429,14 @@ var Zepto = (function () {
             }
             return concat.apply(zepto.isZ(this) ? this.toArray() : this, args);
         },
+        map: function (fn) {
+            return $($.map(this, function (el, i) {
+                return fn.call(el, i, el)
+            }));
+        },
+        slice: function () {
+            return $(slice.apply(this, arguments));
+        },
         // dom加载完毕的检测函数
         // 详见 https://segmentfault.com/a/1190000005869515
         // TODO ready
@@ -418,7 +466,86 @@ var Zepto = (function () {
         // 返回数组，将zepto对象转化为真数组
         toArray: function () {
             return this.get()
-        }
+        },
+        size: function () {
+            return this.length;
+        },
+        remove: function () {
+            return this.each(function () {
+                if (this.parentNode != null) {
+                    this.parentNode.removeChild(this);
+                }
+            });
+        },
+        each: function (callback) {
+            emptyArray.every.call(this, function (el, idx) {
+                return callback.call(el, idx, el) !== false;
+            });
+            return this;
+        },
+        filter: function (selector) {
+            if (isFunction(selector)) {
+                return this.not(this.not(selector));
+            }
+            return $(filter, call(this, function (element) {
+                return zepto.matches(element, selector);
+            }));
+        },
+        // 添加元素到当前集合中
+        add: function (selector, context) {
+            return $(uniq(this.concat($(selector, context))));
+        },
+        is: function (selector) {
+            return typeof selector == "string" ? this.length > 0 && zepto.matches(this[0], selector) :
+                selector && this.selector == selector.selector
+        },
+        not: function (selector) {
+            var nodes = [];
+            if (isFunction(selector) && selector.call !== undefined) {
+                this.each(function (idx) {
+                    if (!selector.call(this, idx)) nodes.push(this);
+                });
+            } else {
+                var excludes = typeof selector == 'string' ? this.filter(selector) :
+                    (likeArray(selector) && isFunction(selector.item)) ? slice.call(selector) : $(selector);
+
+                this.forEach(function (el) {
+                    if (excludes.indexOf(el) < 0) nodes.push(el);
+                });
+            }
+        },
+        has: function (selector) {
+            return this.filter(function () {
+                return isObject(selector) ?
+                    $.contains(this, selector) :
+                    $(this).find(selector).size();
+            });
+        },
+        eq: function (idx) {
+            // 其实就是这样 [].slice.apply({0:1, 1: 2,length: 2}, [0, 1])
+            return idx === -1 ? this.slice(idx) : this.slice(idx, +idx + 1);
+        },
+        first: function () {
+            var el = this[0];
+            return el && !isObject(el) ? el : $(el);
+        },
+        last: function () {
+            var el = this[this.length - 1];
+            return el && !isObject(el) ? el : $(el);
+        },
+        find: function (selector) {
+            var result, $this = this;
+            if (!selector) {
+                result = $()
+            } else if (typeof selector == "object"){
+                result = $(selector).filter(function () {
+                    var node = this;
+                    return emptyArray.some.call($this, function (parent) {
+                       return $.contains(parent, node);
+                    });
+                });
+            }
+        },
     };
 
     // 这里就是将‘$.fn’ 添加到 ‘zepto.Z’的原型上 和 ‘Z’的原型上
