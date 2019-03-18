@@ -318,6 +318,10 @@ var Zepto = (function () {
 
     // 驼峰 命名转化
     $.camelCase = camelize;
+    // trim函数
+    $.trim = function (str) {
+        return str == null ? '' : String.prototype.trim.call(str);
+    };
 
     // 通过遍历集合中的元素，返回通过迭代函数的全部结果，（注：一个新数组）null 和 undefined 将被过滤掉。
     $.map = function (elements, callback) {

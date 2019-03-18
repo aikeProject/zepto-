@@ -105,4 +105,33 @@ describe('zepto', () => {
             expect($.isNumeric(undefined)).to.be.false
         });
     });
+
+    describe('$.trim', () => {
+        it('should $.trim', function () {
+            expect($.trim('blah ')).to.equal('blah');
+            expect($.trim(undefined)).to.equal('');
+            expect($.trim(null)).to.equal('');
+            expect($.trim('')).to.equal('');
+            expect($.trim(0)).to.equal('0');
+            expect($.trim(' left')).to.equal('left');
+            expect($.trim('right  ')).to.equal('right');
+        });
+    });
+
+    describe('$.camelCase', () => {
+        it('should $.camelCase', function () {
+            expect($.camelCase('hello')).to.equal('hello');
+            expect($.camelCase('Hello')).to.equal('Hello');
+            expect($.camelCase('HELLO')).to.equal('HELLO');
+            expect($.camelCase('hello-world')).to.equal('helloWorld');
+        });
+    });
+
+    describe('$.extend', () => {
+        it('should $.extend', function () {
+            expect($.extend({})).to.eql({});
+            expect($.extend({a: "1", e: "f"}, {a: "b", c: "d"})).to.eql({a: "b", c: "d", e: "f"});
+
+        });
+    });
 });
