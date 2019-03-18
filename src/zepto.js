@@ -323,6 +323,10 @@ var Zepto = (function () {
         return str == null ? '' : String.prototype.trim.call(str);
     };
 
+    // 引用一个空函数，什么都不处理
+    $.noop = function () {
+    };
+
     // 通过遍历集合中的元素，返回通过迭代函数的全部结果，（注：一个新数组）null 和 undefined 将被过滤掉。
     $.map = function (elements, callback) {
         var value, values = [], i, key;
@@ -362,6 +366,8 @@ var Zepto = (function () {
     $.grep = function (element, callback) {
         return filter.call(element, callback);
     };
+
+    if (window.JSON) $.parseJSON = JSON.parse;
 
     // Populate the class2type map
     // 第一次调用 ‘$.each’ 给 'class2type' 赋值, 类型检测的运用
